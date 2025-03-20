@@ -85,15 +85,24 @@ download_node() {
   export NODE_ENV="testnet"
   export LOG_LEVEL="debug"
   export LOG_PRETTY="false"
-  export EXECUTOR_PROCESS_ORDERS="true"
-  export EXECUTOR_PROCESS_CLAIMS="true"
+  export EXECUTOR_PROCESS_BIDS_ENABLED=true
+  export EXECUTOR_PROCESS_ORDERS_ENABLED=true
+  export EXECUTOR_PROCESS_CLAIMS_ENABLED=true
+  export ENABLED_NETWORKS='arbitrum-sepolia,base-sepolia,optimism-sepolia,unichain-sepolia,l2rn'
   export PRIVATE_KEY_LOCAL="$PRIVATE_KEY_LOCAL"
-  export ENABLED_NETWORKS="arbitrum-sepolia,base-sepolia,optimism-sepolia,l1rn"
-  export RPC_ENDPOINTS_BSSP="https://base-sepolia-rpc.publicnode.com"
-  export RPC_ENDPOINTS_L1RN="https://brn.calderarpc.com/"
-  export RPC_ENDPOINTS_ARBT="https://api.zan.top/arb-sepolia"
-  export EXECUTOR_MAX_L3_GAS_PRICE=1000
-  export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API="false"
+  export EXECUTOR_PROCESS_BIDS_ENABLED=true
+  export EXECUTOR_ENABLE_BATCH_BIDING=true
+  export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=false
+  export EXECUTOR_PROCESS_ORDERS_API_ENABLED=false
+  export RPC_ENDPOINTS='{
+      "l2rn": ["https://b2n.rpc.caldera.xyz/http"],
+      "arbt": ["https://arbitrum-sepolia.drpc.org", "https://sepolia-rollup.arbitrum.io/rpc"],
+      "bast": ["https://base-sepolia-rpc.publicnode.com", "https://base-sepolia.drpc.org"],
+      "opst": ["https://sepolia.optimism.io", "https://optimism-sepolia.drpc.org"],
+      "unit": ["https://unichain-sepolia.drpc.org", "https://sepolia.unichain.org"],
+      "bssp": ["https://base-sepolia-rpc.publicnode.com/", "https://sepolia.base.org"]
+  }'
+  export EXECUTOR_MAX_L3_GAS_PRICE=1050
 
   cd $HOME/executor/executor/bin/
 
