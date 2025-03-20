@@ -21,7 +21,7 @@ update_node() {
 
   cd $HOME
 
-  sudo wget https://github.com/t3rn/executor-release/releases/download/v0.47.0/executor-linux-v0.47.0.tar.gz -O executor-linux.tar.gz
+  sudo wget https://github.com/t3rn/executor-release/releases/download/v0.53.0/executor-linux-v0.53.0.tar.gz -O executor-linux.tar.gz
   sudo tar -xzvf executor-linux.tar.gz
   sudo rm -rf executor-linux.tar.gz
   cd executor
@@ -68,7 +68,7 @@ download_node() {
 
   cd $HOME
 
-  sudo wget https://github.com/t3rn/executor-release/releases/download/v0.47.0/executor-linux-v0.47.0.tar.gz -O executor-linux.tar.gz
+  sudo wget https://github.com/t3rn/executor-release/releases/download/v0.53.0/executor-linux-v0.53.0.tar.gz -O executor-linux.tar.gz
   sudo tar -xzvf executor-linux.tar.gz
   sudo rm -rf executor-linux.tar.gz
   cd executor
