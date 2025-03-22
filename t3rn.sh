@@ -216,25 +216,42 @@ stop_node() {
 }
 
 auto_restart_node() {
-  if screen -list | grep -q "\.t3rnnode_auto"; then
-    sudo screen -X -S t3rnnode_auto quit
-    echo 'У вас уже был существующий скрин t3rnnode_auto. Он был удален'
-  else
-    echo 'Начинаю запуск...'
+  screen_name="t3rnnode_auto"
+  script_path="$HOME/t3rn_restart.sh"
+
+  if screen -list | grep -q "\.$screen_name"; then
+    screen -X -S "$screen_name" quit
+    echo "Существующий screen '$screen_name' был остановлен."
   fi
 
-  screen -dmS t3rnnode_auto bash -c '
-    echo "Начало выполнения скрипта в screen-сессии"
+  cat > "$script_path" << 'EOF'
+restart_node() {
+  echo 'Начинаю перезагрузку...'
 
-    while true; do
-      restart_node
-      sleep 7200
-    done
+  session="t3rnnode"
+  
+  if screen -list | grep -q "\.${session}"; then
+    screen -S "${session}" -p 0 -X stuff "^C"
+    sleep 1
+    screen -S "${session}" -p 0 -X stuff "./executor\n"
+    echo "Нода была перезагружена."
+  else
+    echo "Сессия ${session} не найдена."
+  fi
+}
 
-    exec bash
-  '
+while true; do
+  restart_node
+  sleep 7200
+done
+EOF
+  chmod +x "$script_path"
 
-  echo "Screen сессия 't3rnnode_auto' создана и нода будет перезагружаться каждые 2 часа..."
+  screen -dmS "$screen_name" bash "$script_path"
+  echo "Screen-сессия '$screen_name' создана, нода будет перезапускаться каждые 2 часа."
+
+  (crontab -l 2>/dev/null | grep -v "$script_path"; echo "@reboot screen -dmS $screen_name bash $script_path") | crontab -
+  echo "Задание добавлено в crontab для автозапуска при перезагрузке сервера."
 }
 
 restart_node() {
