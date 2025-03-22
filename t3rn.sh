@@ -19,6 +19,26 @@ update_node() {
 
   read -p "Введите ваш приватный ключ: " PRIVATE_KEY_LOCAL
 
+  download_or_update
+}
+
+download_node() {
+  if [ -d "$HOME/executor" ] || screen -list | grep -q "\.t3rnnode"; then
+    echo 'Папка executor или сессия t3rnnode уже существуют. Установка невозможна. Выберите удалить ноду или выйти из скрипта.'
+    return
+  fi
+
+  echo 'Начинаю установку ноды...'
+
+  read -p "Введите ваш приватный ключ: " PRIVATE_KEY_LOCAL
+
+  sudo apt update -y && sudo apt upgrade -y
+  sudo apt-get install make screen build-essential software-properties-common curl git nano jq -y
+
+  download_or_update
+}
+
+download_or_update() {
   cd $HOME
 
   echo "Выберите вариант установки:"
@@ -67,81 +87,6 @@ update_node() {
       "unit": ["https://unichain-sepolia.drpc.org", "https://sepolia.unichain.org"],
       "bssp": ["https://base-sepolia-rpc.publicnode.com/", "https://sepolia.base.org"],
       "blst": ["https://blast-sepolia-rpc.example.com"]
-  }'
-  export EXECUTOR_MAX_L3_GAS_PRICE=1050
-
-  cd $HOME/executor/executor/bin/
-
-  screen -dmS t3rnnode bash -c '
-    echo "Начало выполнения скрипта в screen-сессии"
-
-    cd $HOME/executor/executor/bin/
-    ./executor
-
-    exec bash
-  '
-
-  echo "Screen сессия 't3rnnode' создана и нода запущена..."
-}
-
-download_node() {
-  if [ -d "$HOME/executor" ] || screen -list | grep -q "\.t3rnnode"; then
-    echo 'Папка executor или сессия t3rnnode уже существуют. Установка невозможна. Выберите удалить ноду или выйти из скрипта.'
-    return
-  fi
-
-  echo 'Начинаю установку ноды...'
-
-  read -p "Введите ваш приватный ключ: " PRIVATE_KEY_LOCAL
-
-  sudo apt update -y && sudo apt upgrade -y
-  sudo apt-get install make screen build-essential software-properties-common curl git nano jq -y
-
-  echo "Выберите вариант установки:"
-  echo "1) Установить последнюю версию"
-  echo "2) Установить конкретную версию"
-  read -p "Введите номер варианта (1 или 2): " CHOICE
-
-  if [ "$CHOICE" = "1" ]; then
-    sudo curl -s https://api.github.com/repos/t3rn/executor-release/releases/latest | \
-      grep -Po '"tag_name": "\K.*?(?=")' | \
-      xargs -I {} wget https://github.com/t3rn/executor-release/releases/download/{}/executor-linux-{}.tar.gz
-    sudo tar -xzf executor-linux-*.tar.gz
-    sudo rm -rf executor-linux-*.tar.gz
-  elif [ "$CHOICE" = "2" ]; then
-    read -p "Введите номер версии (например, 53 для v0.53.0): " VERSION
-    VERSION_FULL="v0.${VERSION}.0"
-    sudo wget https://github.com/t3rn/executor-release/releases/download/${VERSION_FULL}/executor-linux-${VERSION_FULL}.tar.gz -O executor-linux.tar.gz
-    sudo tar -xzvf executor-linux.tar.gz
-    sudo rm -rf executor-linux.tar.gz
-  else
-    echo "Неверный выбор. Установка отменена."
-    return
-  fi
-
-  cd executor
-
-  export ENVIRONMENT="testnet"
-  export LOG_LEVEL="debug"
-  export LOG_PRETTY="false"
-  export EXECUTOR_PROCESS_BIDS_ENABLED=true
-  export EXECUTOR_PROCESS_ORDERS_ENABLED=true
-  export EXECUTOR_PROCESS_CLAIMS_ENABLED=true
-  export ENABLED_NETWORKS='arbitrum-sepolia,base-sepolia,optimism-sepolia,l2rn'
-  export PRIVATE_KEY_LOCAL="$PRIVATE_KEY_LOCAL"
-  export EXECUTOR_PROCESS_BIDS_ENABLED=true
-  export EXECUTOR_ENABLE_BATCH_BIDING=true
-  export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=false
-  export EXECUTOR_PROCESS_ORDERS_API_ENABLED=false
-  export EXECUTOR_ENABLE_BATCH_BIDDING=true
-  export EXECUTOR_PROCESS_BIDS_BATCH=true
-  export RPC_ENDPOINTS='{
-      "l2rn": ["https://b2n.rpc.caldera.xyz/http"],
-      "arbt": ["https://arbitrum-sepolia.drpc.org", "https://sepolia-rollup.arbitrum.io/rpc"],
-      "bast": ["https://base-sepolia-rpc.publicnode.com", "https://base-sepolia.drpc.org"],
-      "opst": ["https://sepolia.optimism.io", "https://optimism-sepolia.drpc.org"],
-      "unit": ["https://unichain-sepolia.drpc.org", "https://sepolia.unichain.org"],
-      "bssp": ["https://base-sepolia-rpc.publicnode.com/", "https://sepolia.base.org"]
   }'
   export EXECUTOR_MAX_L3_GAS_PRICE=1050
 
