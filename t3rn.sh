@@ -21,30 +21,52 @@ update_node() {
 
   cd $HOME
 
-  sudo wget https://github.com/t3rn/executor-release/releases/download/v0.53.0/executor-linux-v0.53.0.tar.gz -O executor-linux.tar.gz
-  sudo tar -xzvf executor-linux.tar.gz
-  sudo rm -rf executor-linux.tar.gz
+  echo "Выберите вариант установки:"
+  echo "1) Установить последнюю версию"
+  echo "2) Установить конкретную версию"
+  read -p "Введите номер варианта (1 или 2): " CHOICE
+
+  if [ "$CHOICE" = "1" ]; then
+    sudo curl -s https://api.github.com/repos/t3rn/executor-release/releases/latest | \
+      grep -Po '"tag_name": "\K.*?(?=")' | \
+      xargs -I {} wget https://github.com/t3rn/executor-release/releases/download/{}/executor-linux-{}.tar.gz
+    sudo tar -xzf executor-linux-*.tar.gz
+    sudo rm -rf executor-linux-*.tar.gz
+  elif [ "$CHOICE" = "2" ]; then
+    read -p "Введите номер версии (например, 53 для v0.53.0): " VERSION
+    VERSION_FULL="v0.${VERSION}.0"
+    sudo wget https://github.com/t3rn/executor-release/releases/download/${VERSION_FULL}/executor-linux-${VERSION_FULL}.tar.gz -O executor-linux.tar.gz
+    sudo tar -xzvf executor-linux.tar.gz
+    sudo rm -rf executor-linux.tar.gz
+  else
+    echo "Неверный выбор. Установка отменена."
+    return
+  fi
+
   cd executor
 
-  export NODE_ENV="testnet"
+  export ENVIRONMENT="testnet"
   export LOG_LEVEL="debug"
   export LOG_PRETTY="false"
   export EXECUTOR_PROCESS_BIDS_ENABLED=true
   export EXECUTOR_PROCESS_ORDERS_ENABLED=true
   export EXECUTOR_PROCESS_CLAIMS_ENABLED=true
-  export ENABLED_NETWORKS='arbitrum-sepolia,base-sepolia,optimism-sepolia,unichain-sepolia,l2rn'
+  export ENABLED_NETWORKS='arbitrum-sepolia,base-sepolia,optimism-sepolia,l2rn'
   export PRIVATE_KEY_LOCAL="$PRIVATE_KEY_LOCAL"
   export EXECUTOR_PROCESS_BIDS_ENABLED=true
   export EXECUTOR_ENABLE_BATCH_BIDING=true
   export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=false
   export EXECUTOR_PROCESS_ORDERS_API_ENABLED=false
+  export EXECUTOR_ENABLE_BATCH_BIDDING=true
+  export EXECUTOR_PROCESS_BIDS_BATCH=true
   export RPC_ENDPOINTS='{
       "l2rn": ["https://b2n.rpc.caldera.xyz/http"],
       "arbt": ["https://arbitrum-sepolia.drpc.org", "https://sepolia-rollup.arbitrum.io/rpc"],
       "bast": ["https://base-sepolia-rpc.publicnode.com", "https://base-sepolia.drpc.org"],
       "opst": ["https://sepolia.optimism.io", "https://optimism-sepolia.drpc.org"],
       "unit": ["https://unichain-sepolia.drpc.org", "https://sepolia.unichain.org"],
-      "bssp": ["https://base-sepolia-rpc.publicnode.com/", "https://sepolia.base.org"]
+      "bssp": ["https://base-sepolia-rpc.publicnode.com/", "https://sepolia.base.org"],
+      "blst": ["https://blast-sepolia-rpc.example.com"]
   }'
   export EXECUTOR_MAX_L3_GAS_PRICE=1050
 
@@ -75,25 +97,44 @@ download_node() {
   sudo apt update -y && sudo apt upgrade -y
   sudo apt-get install make screen build-essential software-properties-common curl git nano jq -y
 
-  cd $HOME
+  echo "Выберите вариант установки:"
+  echo "1) Установить последнюю версию"
+  echo "2) Установить конкретную версию"
+  read -p "Введите номер варианта (1 или 2): " CHOICE
 
-  sudo wget https://github.com/t3rn/executor-release/releases/download/v0.53.0/executor-linux-v0.53.0.tar.gz -O executor-linux.tar.gz
-  sudo tar -xzvf executor-linux.tar.gz
-  sudo rm -rf executor-linux.tar.gz
+  if [ "$CHOICE" = "1" ]; then
+    sudo curl -s https://api.github.com/repos/t3rn/executor-release/releases/latest | \
+      grep -Po '"tag_name": "\K.*?(?=")' | \
+      xargs -I {} wget https://github.com/t3rn/executor-release/releases/download/{}/executor-linux-{}.tar.gz
+    sudo tar -xzf executor-linux-*.tar.gz
+    sudo rm -rf executor-linux-*.tar.gz
+  elif [ "$CHOICE" = "2" ]; then
+    read -p "Введите номер версии (например, 53 для v0.53.0): " VERSION
+    VERSION_FULL="v0.${VERSION}.0"
+    sudo wget https://github.com/t3rn/executor-release/releases/download/${VERSION_FULL}/executor-linux-${VERSION_FULL}.tar.gz -O executor-linux.tar.gz
+    sudo tar -xzvf executor-linux.tar.gz
+    sudo rm -rf executor-linux.tar.gz
+  else
+    echo "Неверный выбор. Установка отменена."
+    return
+  fi
+
   cd executor
 
-  export NODE_ENV="testnet"
+  export ENVIRONMENT="testnet"
   export LOG_LEVEL="debug"
   export LOG_PRETTY="false"
   export EXECUTOR_PROCESS_BIDS_ENABLED=true
   export EXECUTOR_PROCESS_ORDERS_ENABLED=true
   export EXECUTOR_PROCESS_CLAIMS_ENABLED=true
-  export ENABLED_NETWORKS='arbitrum-sepolia,base-sepolia,optimism-sepolia,unichain-sepolia,l2rn'
+  export ENABLED_NETWORKS='arbitrum-sepolia,base-sepolia,optimism-sepolia,l2rn'
   export PRIVATE_KEY_LOCAL="$PRIVATE_KEY_LOCAL"
   export EXECUTOR_PROCESS_BIDS_ENABLED=true
   export EXECUTOR_ENABLE_BATCH_BIDING=true
   export EXECUTOR_PROCESS_PENDING_ORDERS_FROM_API=false
   export EXECUTOR_PROCESS_ORDERS_API_ENABLED=false
+  export EXECUTOR_ENABLE_BATCH_BIDDING=true
+  export EXECUTOR_PROCESS_BIDS_BATCH=true
   export RPC_ENDPOINTS='{
       "l2rn": ["https://b2n.rpc.caldera.xyz/http"],
       "arbt": ["https://arbitrum-sepolia.drpc.org", "https://sepolia-rollup.arbitrum.io/rpc"],
@@ -120,7 +161,19 @@ download_node() {
 
 check_logs() {
   if screen -list | grep -q "\.t3rnnode"; then
-    screen -S t3rnnode -X hardcopy /tmp/screen_log.txt && sleep 0.1 && tail -n 100 /tmp/screen_log.txt && rm /tmp/screen_log.txt
+    screen -S t3rnnode -X hardcopy -h /tmp/screen_log.txt
+    sleep 0.1
+    
+    if [ -f /tmp/screen_log.txt ]; then
+      echo "=== Последние логи t3rnnode ==="
+      echo "----------------------------------------"
+      tail -n 40 /tmp/screen_log.txt | awk '{print "\033[0;32m" NR "\033[0m: " $0}'
+      echo "----------------------------------------"
+      echo "Логи успешно выведены (время: $(date '+%H:%M:%S %d.%m.%Y'))"
+      rm -f /tmp/screen_log.txt
+    else
+      echo "Ошибка: Не удалось получить логи из screen-сессии."
+    fi
   else
     echo "Сессия t3rnnode не найдена."
   fi
@@ -136,7 +189,7 @@ change_fee() {
 
     session="t3rnnode"
 
-    read -p 'На какой газ GWEI вы хотите изменить? (по стандарту 105) ' GWEI_SET
+    read -p 'На какой газ GWEI вы хотите изменить? (по стандарту 1050) ' GWEI_SET
 
     if screen -list | grep -q "\.${session}"; then
       screen -S "${session}" -p 0 -X stuff "^C"
