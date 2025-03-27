@@ -17,6 +17,7 @@ download_node() {
 
   if [ -d "$HOME/bot" ]; then
     sudo rm -rf "$HOME/bot"
+    sudo rm -rf "$HOME/gaianet"
   fi
 
   if screen -list | grep -q "gaianetnode"; then
