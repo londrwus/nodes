@@ -15,6 +15,14 @@ download_node() {
   sudo apt update -y && sudo apt upgrade -y
   sudo apt-get install screen nano git curl build-essential make lsof wget jq -y
 
+  if [ -d "$HOME/bot" ]; then
+    sudo rm -rf "$HOME/bot"
+  fi
+
+  if screen -list | grep -q "gaianetnode"; then
+    screen -ls | grep gaianetnode | cut -d. -f1 | awk '{print $1}' | xargs kill
+  fi
+
   curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash -
   sudo apt-get install -y nodejs
 
@@ -25,10 +33,8 @@ download_node() {
   sed -i 's#curl -sSf https://raw\.githubusercontent\.com/WasmEdge/WasmEdge/master/utils/install_v2\.sh | bash -s -- -v $wasmedge_version --ggmlbn=$ggml_bn --tmpdir=$tmp_dir#curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install_v2.sh | bash -s -- -v 0.14.1 --noavx#g' gaia_install.sh
   bash gaia_install.sh
   bash -c "source ~/.bashrc"
-}
 
-keep_download() {
-  bash -c "source ~/.bashrc"
+  eval "$(cat ~/.bashrc | tail -n +10)"
 
   gaianet init --config https://raw.gaianet.ai/qwen2-0.5b-instruct/config.json
 
@@ -108,6 +114,10 @@ link_domain() {
       exit 1
   fi
 
+  read -p "Введите API токен: " api_token
+  sed -i "/^\s*};$/i \ \ \ \ \ \ 'Authorization': '$api_token'," bot_gaia.js
+  echo "Токен успешно добавлен в bot_gaia.js"
+
   screen -ls | grep gaianetnode | cut -d. -f1 | awk '{print $1}' | xargs kill
   gaianet stop
   gaianet config --domain gaia.domains
@@ -177,15 +187,14 @@ while true; do
     sleep 2
     echo -e "\n\nМеню:"
     echo "1. ✨ Установить ноду"
-    echo "2. 🔰 Продолжить установку"
-    echo "3. 📊 Посмотреть данные"
-    echo "4. 🟦 Посмотреть логи"
-    echo "5. 🔄 Обновить ноду"
-    echo "6. 🔗 Привязать домен"
-    echo "7. 🚀 Запустить ноду"
-    echo "8. 🛑 Остановить ноду"
-    echo "9. 🗑️ Удалить ноду"
-    echo -e "10. 👋 Выйти из скрипта\n"
+    echo "2. 📊 Посмотреть данные"
+    echo "3. 🟦 Посмотреть логи"
+    echo "4. 🔄 Обновить ноду"
+    echo "5. 🔗 Привязать домен"
+    echo "6. 🚀 Запустить ноду"
+    echo "7. 🛑 Остановить ноду"
+    echo "8. 🗑️ Удалить ноду"
+    echo -e "9. 👋 Выйти из скрипта\n"
     read -p "Выберите пункт меню: " choice
 
     case $choice in
@@ -193,30 +202,27 @@ while true; do
         download_node
         ;;
       2)
-        keep_download
-        ;;
-      3)
         check_states
         ;;
-      4)
+      3)
         check_logs
         ;;
-      5)
+      4)
         update_node
         ;;
-      6)
+      5)
         link_domain
         ;;
-      7)
+      6)
         start_node
         ;;
-      8)
+      7)
         stop_node
         ;;
-      9)
+      8)
         delete_node
         ;;
-      10)
+      9)
         exit_from_script
         ;;
       *)
