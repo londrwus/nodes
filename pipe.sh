@@ -107,10 +107,32 @@ check_logs() {
 }
 
 check_node_status() {
-  echo "Проверка статуса и репутации ноды."
+  local attempts=0
+  local max_attempts=10
+  local output
 
+  echo "Проверка статуса и репутации ноды."
+  
   cd $HOME
-  ./pop --status
+  
+  while [ $attempts -lt $max_attempts ]; do
+    output=$(./pop --status 2>&1)
+    
+    echo "$output"
+    
+    last_two_lines=$(echo "$output" | tail -n 2)
+    if [[ "$last_two_lines" != *"Parsed node_info.json"* ]]; then
+      break
+    fi
+    
+    attempts=$((attempts + 1))
+    echo "Попытка $attempts: Обнаружен 'Parsed node_info.json' в последних двух строках, повторяем..."
+    sleep 1
+  done
+  
+  if [ $attempts -eq $max_attempts ]; then
+    echo "Достигнуто максимальное количество попыток ($max_attempts)"
+  fi
 }
 
 display_node_info() {
