@@ -35,6 +35,8 @@ download_node() {
 
   source ~/.bashrc
 
+  screen -S drianode
+
   echo 'Теперь запускайте ноду.'
 }
 
