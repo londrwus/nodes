@@ -88,7 +88,6 @@ while true; do
     read -p "Выберите пункт меню: " choice
 
     case $choice in
-      case $choice in
       1)
         download_node
         ;;
