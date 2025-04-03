@@ -10,11 +10,6 @@ channel_logo() {
 download_node() {
   echo 'Начинаю установку ноды...'
 
-  if [ -d "$HOME/.dria" ]; then
-    dkn-compute-launcher uninstall
-    sudo rm rf .dria/
-  fi
-
   sudo apt install lsof
 
   ports=(6011 4001)
@@ -28,6 +23,15 @@ download_node() {
 
   sudo apt-get update -y && sudo apt-get upgrade -y
   sudo apt install -y wget make tar screen nano unzip lz4 gcc git jq
+
+  if screen -list | grep -q "drianode"; then
+    screen -ls | grep drianode | cut -d. -f1 | awk '{print $1}' | xargs kill
+  fi
+
+  if [ -d "$HOME/.dria" ]; then
+    dkn-compute-launcher uninstall
+    sudo rm rf .dria/
+  fi
 
   curl -fsSL https://ollama.com/install.sh | sh
 
@@ -58,6 +62,10 @@ models_check() {
 
 delete_node() {
   dkn-compute-launcher uninstall
+
+  if screen -list | grep -q "drianode"; then
+    screen -ls | grep drianode | cut -d. -f1 | awk '{print $1}' | xargs kill
+  fi
 }
 
 exit_from_script() {
