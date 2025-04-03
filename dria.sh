@@ -10,6 +10,8 @@ channel_logo() {
 download_node() {
   echo 'Начинаю установку ноды...'
 
+  cd $HOME
+
   sudo apt install lsof
 
   ports=(6011 4001)
