@@ -62,6 +62,8 @@ download_node() {
   wget -O pop "https://dl.pipecdn.app/v0.2.8/pop"
   chmod +x pop
 
+  mkdir download_cache
+
   sudo ./pop  --ram ${RAM}   --max-disk ${DISK_SPACE}  --cache-dir $HOME/download_cache --pubKey ${SOLADDRESS} --signup-by-referral-route 63d264373ecf57ec
 
   sudo tee /etc/systemd/system/pipe.service > /dev/null << EOF
@@ -175,7 +177,7 @@ while true; do
     sleep 2
     echo -e "\n\nМеню:"
     echo "1. 😊 Установить ноду"
-    echo "2. 📜 Посмотреть логи"
+    echo "2. 📜 Просмотреть логи"
     echo "3. 🔍 Проверить статус ноды"
     echo "4. 📱 Показать информацию о ноде"
     echo "5. 🔄 Перезапустить ноду"
