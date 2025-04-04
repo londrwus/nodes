@@ -167,7 +167,13 @@ stop_node() {
 }
 
 delete_node() {
-  cd $HOME
+  echo 'Начинаю удаление ноды.'
+
+  sudo rm -rf download_cache
+  sudo rm node_info.json
+  sudo rm pop
+
+  echo 'Нода была удалена.'
 }
 
 exit_from_script() {
