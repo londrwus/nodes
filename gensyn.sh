@@ -102,6 +102,8 @@ launch_node() {
 }
 
 watch_logs() {
+  echo "Просмотр логов (Ctrl+C для возврата в меню)..."
+  trap 'echo -e "\nВозврат в меню..."; return' SIGINT
   tail -n 100 -f $HOME/rl-swarm/gensynnode.log
 }
 
