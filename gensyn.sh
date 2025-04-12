@@ -144,6 +144,15 @@ userapikey() {
   cat ~/rl-swarm/modal-login/temp-data/userApiKey.json
 }
 
+update_node() {
+  cd $HOME
+  cd ~/rl-swarm
+  git reset --hard origin/main
+  git pull origin main
+
+  echo 'Нода была обновлена.'
+}
+
 stop_node() {
   if screen -list | grep -q "gensynnode"; then
     screen -ls | grep gensynnode | cut -d. -f1 | awk '{print $1}' | xargs kill
@@ -184,9 +193,10 @@ while true; do
     echo "5. 🌐 Запустить локальный сервер"
     echo "6. 👤 Показать данные пользователя"
     echo "7. 🔑 Показать API ключ пользователя"
-    echo "8. ⛔ Остановить ноду"
-    echo "9. 🗑️ Удалить ноду"
-    echo "10. 👋 Выйти из скрипта"
+    echo "8. ✅ Обновить ноду"
+    echo "9. ⛔ Остановить ноду"
+    echo "10. 🗑️ Удалить ноду"
+    echo "11. 👋 Выйти из скрипта"
     read -p "Выберите пункт меню: " choice
 
     case $choice in
@@ -212,12 +222,15 @@ while true; do
         userapikey
         ;;
       8)
-        stop_node
+        update_node
         ;;
       9)
-        delete_node
+        stop_node
         ;;
       10)
+        delete_node
+        ;;
+      11)
         exit_from_script
         ;;
       *)
