@@ -147,6 +147,7 @@ userapikey() {
 update_node() {
   cd $HOME
   cd ~/rl-swarm
+  git fetch origin
   git reset --hard origin/main
   git pull origin main
 
