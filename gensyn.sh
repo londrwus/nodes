@@ -138,6 +138,8 @@ update_node() {
     cd ~/rl-swarm
     
     cp swarm.pen $HOME/backup_swarm.pen
+    cp ~/rl-swarm/modal-login/temp-data/userData.json $HOME/backup_userData.json
+    cp ~/rl-swarm/modal-login/temp-data/userApiKey.json $HOME/backup_userApiKey.json
     
     git fetch origin
     git reset --hard origin/main
