@@ -46,10 +46,8 @@ download_node() {
   mkdir soneium-minato-node
   cd soneium-minato-node/
 
-  wget -O docker-compose.yml https://docs.soneium.org/assets/files/docker-compose-050b868cd6979d02fd02cd804fea5a32.yml
-  wget -O minato-genesis.json https://docs.soneium.org/assets/files/minato-genesis-5e5db79442a6436778e9c3c80a9fd80d.json
-  wget -O minato-rollup.json https://docs.soneium.org/assets/files/minato-rollup-527fed518b6b3a453c3ebd91c51cfdc7.json
-  wget -O sample.env https://docs.soneium.org/assets/files/sample-0cebbc00b0f006ba569605dae6dadac2.env
+  wget -O docker-compose.yml https://docs.soneium.org/assets/files/docker-compose-6919c7305ad0dc48fffc3c6c699784f1.yml
+  wget -O sample.env https://docs.soneium.org/assets/files/sample-55cb77d86502f477967d7ca2c81c1f3c.env
 
   openssl rand -hex 32 > jwt.txt
   mv sample.env .env
@@ -58,7 +56,7 @@ download_node() {
 
   echo "Ваш IP-адрес сервера: $SERVER_IP. Это правильный IP? (y/n)"
   read -r CONFIRM
-  
+
   if [[ $CONFIRM == "y" ]]; then
       echo "IP подтвержден: $SERVER_IP"
   else
@@ -112,7 +110,7 @@ stop_node() {
 
   cd $HOME/soneium-minato-node
   sudo docker-compose down
-  
+
   echo 'Ноды были остановлены.'
 }
 
@@ -126,7 +124,7 @@ clear_data_containers() {
 }
 
 delete_node() {
-  read -p 'Если вы уверены удалить ноду, напишите любой символ (CTRL+C чтобы выйти): ' checkjust
+  read -p 'Если вы уверены, что хотите удалить ноду, напишите любой символ (CTRL+C чтобы выйти): ' checkjust
 
   cd $HOME/soneium-minato-node
   sudo docker-compose down --volumes --remove-orphans
